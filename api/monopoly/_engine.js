@@ -448,11 +448,14 @@ function drawCard(s, p, deckName) {
     case 'collectEach':
       alivePlayers(s).forEach(function (o) { if (o.id !== p.id) { var pay = Math.min(o.cash, a.amount); o.cash -= pay; p.cash += pay; } });
       break;
-    case 'payEach':
+    case 'payEach': {
+      // pay each player in turn; if the payer runs out, charge() parks the
+      // remaining debt to the player they couldn't pay (never to the bank, so
+      // money is never lost). They must then raise funds or go bankrupt.
       var others = alivePlayers(s).filter(function (o) { return o.id !== p.id; });
-      charge(s, p, a.amount * others.length, null, false);
-      if (!s.turn.debt) others.forEach(function (o) { o.cash += a.amount; });
+      for (var oi = 0; oi < others.length; oi++) { if (!charge(s, p, a.amount, others[oi].id)) break; }
       break;
+    }
     case 'nearestRail': {
       var ri = nearest(p.position, groupMembers('rail'));
       moveTo(s, p, ri, true);
@@ -589,8 +592,7 @@ function doAuctionPass(s, pid, now) {
 function resolveAuctionIfDone(s, now) {
   var au = s.pending; if (!au || au.kind !== 'auction') return;
   if (au.active.length > 1) return;
-  // last remaining bidder, or the high bidder, wins
-  var winnerId = au.high ? au.high.id : (au.active.length === 1 ? null : null);
+  // the high bidder wins; if nobody ever bid, the lot stays unsold
   if (au.high) {
     var w = player(s, au.high.id);
     w.cash -= au.high.amount; rec(s, au.tile).owner = w.id;
