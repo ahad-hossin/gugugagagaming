@@ -47,6 +47,28 @@
     var m = UI.modal(box); var c = UI.el('button', 'ghost full', 'Close'); c.style.marginTop = '.6rem'; c.onclick = m.close; box.appendChild(c);
   };
 
+  // ---- shared helpers ----
+  function copyInvite() {
+    var url = location.origin + '/monopoly/?room=' + (Store.code() || '');
+    if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { UI.toast('Invite link copied!', 'good'); }, function () { prompt('Copy this link:', url); });
+    else prompt('Copy this link:', url);
+  }
+  function openGameMenu() {
+    var box = UI.el('div');
+    box.innerHTML = '<h2>Menu</h2>';
+    var col = UI.el('div'); col.style.cssText = 'display:flex;flex-direction:column;gap:.5rem';
+    function row(label, fn) { var b = UI.el('button', 'ghost full', label); b.style.textAlign = 'left'; b.onclick = fn; col.appendChild(b); return b; }
+    row('📋 Copy invite link', function () { copyInvite(); });
+    var sb = row(prefs.sound ? '🔊 Sound: on' : '🔇 Sound: off', function () { prefs.sound = !prefs.sound; savePrefs(); applySound(); sb.textContent = prefs.sound ? '🔊 Sound: on' : '🔇 Sound: off'; });
+    var mb = row(prefs.music ? '🎵 Music: on' : '🎵 Music: off', function () { prefs.music = !prefs.music; savePrefs(); if (Audio) Audio.resume(); applyMusic(); mb.textContent = prefs.music ? '🎵 Music: on' : '🎵 Music: off'; });
+    box.appendChild(col);
+    var m = UI.modal(box);
+    var leave = UI.el('button', 'btn-bad full', '🚪 Leave game'); leave.style.marginTop = '.6rem';
+    leave.onclick = function () { m.close(); MONO.leave(); };
+    box.appendChild(leave);
+    var close = UI.el('button', 'link full', 'Close'); close.onclick = m.close; box.appendChild(close);
+  }
+
   // ====================== boot ======================
   document.addEventListener('DOMContentLoaded', function () {
     starfield();
@@ -55,6 +77,7 @@
     wireLobby();
     wireGame();
     applySound();
+    applyMusic();
 
     Store.on(function (cur, prev) { MONO.Render.render(cur, prev); });
     Store.on(reactionFx);
@@ -112,11 +135,17 @@
     $('#btn-forget').onclick = function () { Store.clearSession(); $('#resume-bar').hidden = true; };
     var st = $('#sound-toggle');
     st.onclick = function () { prefs.sound = !prefs.sound; savePrefs(); applySound(); };
+    var mt = $('#music-toggle');
+    if (mt) mt.onclick = function () { prefs.music = !prefs.music; savePrefs(); if (Audio) Audio.resume(); applyMusic(); };
     $('#join-code').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('#btn-join').click(); });
   }
   function applySound() {
     if (Audio) Audio.setEnabled(prefs.sound);
     var st = $('#sound-toggle'); if (st) { st.textContent = prefs.sound ? '🔊 Sound on' : '🔇 Sound off'; st.setAttribute('aria-pressed', String(prefs.sound)); }
+  }
+  function applyMusic() {
+    if (Audio) Audio.setMusic(prefs.music);
+    var mt = $('#music-toggle'); if (mt) { mt.textContent = prefs.music ? '🎵 Music on' : '🎵 Music off'; mt.setAttribute('aria-pressed', String(prefs.music)); }
   }
   function busy(btn, on) { if (btn) { btn.disabled = on; btn.style.opacity = on ? '.6' : ''; } }
 
@@ -125,11 +154,7 @@
     $('#btn-ready').onclick = function () { act('setReady', {}); };
     $('#btn-start').onclick = function () { act('startGame', {}).then(function () { if (Audio) Audio.play('start'); }).catch(function () {}); };
     $('#btn-leave-lobby').onclick = function () { Net.action('leave', {}).catch(function () {}); Net.teardown(); Store.clearSession(); location.reload(); };
-    $('#btn-copy').onclick = function () {
-      var url = location.origin + '/monopoly/?room=' + (Store.code() || '');
-      if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { UI.toast('Invite link copied!', 'good'); }, function () { prompt('Copy this link:', url); });
-      else prompt('Copy this link:', url);
-    };
+    $('#btn-copy').onclick = copyInvite;
     if (navigator.share) { var sh = $('#btn-share'); sh.hidden = false; sh.onclick = function () { navigator.share({ title: 'TYCOON', text: 'Join my game!', url: location.origin + '/monopoly/?room=' + (Store.code() || '') }).catch(function () {}); }; }
   }
 
@@ -140,7 +165,8 @@
     $('#chat-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') sendChat(); });
     var rb = $('#reactions-bar');
     ['👍', '😂', '😮', '😡', '🎉', '💸', '🤝', '🔥'].forEach(function (e) { var b = UI.el('button', '', e); b.onclick = function () { Net.action('reaction', { emoji: e }).catch(function () {}); }; rb.appendChild(b); });
-    $('#game-menu-btn').onclick = function () { MONO.leave(); };
+    $('#game-menu-btn').onclick = openGameMenu;
+    if ($('#game-copy')) $('#game-copy').onclick = copyInvite;
     // delegate tile clicks → property detail
     $('#board').addEventListener('click', function (e) {
       var tileEl = e.target.closest('.tile'); if (!tileEl) return;

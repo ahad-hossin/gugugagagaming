@@ -104,6 +104,7 @@
   // ---- dock (player list) ----
   function renderDock(s) {
     var dock = $('#dock'); if (!dock) return;
+    if ($('#dock-count')) $('#dock-count').textContent = '(' + s.players.filter(function (p) { return !p.bankrupt; }).length + '/' + s.players.length + ')';
     dock.innerHTML = '';
     var ordered = s.players.slice().sort(function (a, b) { return a.order - b.order; });
     ordered.forEach(function (p) {
@@ -124,6 +125,7 @@
   // ---- centre ----
   function renderCenter(s) {
     var banner = $('#turn-banner'), ac = $('#action-card'), pot = $('#pot');
+    if ($('#game-code')) $('#game-code').textContent = s.code;
     var act = pById(s, s.turn.activeId);
     if (pot) { if (s.settings.freeParkingPot && s.bank.pot > 0) { pot.hidden = false; pot.textContent = 'Pot ' + money(s.bank.pot); } else pot.hidden = true; }
     if (s.phase === 'ended') { if (banner) banner.innerHTML = 'Game over'; }

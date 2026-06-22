@@ -24,7 +24,7 @@
   var musicBus = null;      // ambient gain → master
   var noiseBuffer = null;   // cached white-noise buffer
   var enabled = true;
-  var musicOn = true;
+  var musicOn = false;   // ambient bed is opt-in (toggle on the home screen)
   var volume = 0.8;
   var ambientNodes = [];    // live ambient sources to tear down
   var ambientTimer = null;
@@ -393,43 +393,40 @@
     clearAmbient();
     musicBus.gain.cancelScheduledValues(now());
     musicBus.gain.setValueAtTime(0.0001, now());
-    musicBus.gain.exponentialRampToValueAtTime(0.42, now() + 3.0);
+    musicBus.gain.exponentialRampToValueAtTime(0.2, now() + 5.0);   // soft, slow fade-in
 
-    // shimmering major pad (C E G + octave), each voice gently drifting
-    [261.63, 329.63, 392.0, 523.25].forEach(function (f, i) {
-      var o = ctx.createOscillator();
-      o.type = (i === 3) ? 'sine' : 'triangle';
-      o.frequency.value = f;
-      var g = ctx.createGain(); g.gain.value = (i === 0 ? 0.06 : 0.035);
-      var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2200;
-      // slow LFO on detune for a breathing, weightless drift
-      var lfo = ctx.createOscillator(); lfo.frequency.value = 0.04 + i * 0.02;
-      var lfoG = ctx.createGain(); lfoG.gain.value = 4;
+    // soft airy pad — pure sines, heavily filtered, each voice slowly breathing
+    // in and out so it never sits as a flat sustained drone.
+    [196.0, 261.63, 329.63].forEach(function (f, i) {              // G3 C4 E4 — warm, sparse
+      var o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+      var g = ctx.createGain();
+      var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 850;
+      // very slow detune drift for life
+      var lfo = ctx.createOscillator(); lfo.frequency.value = 0.025 + i * 0.01;
+      var lfoG = ctx.createGain(); lfoG.gain.value = 2.5;
       lfo.connect(lfoG); lfoG.connect(o.detune);
-      // gentle amplitude swell LFO
-      var alfo = ctx.createOscillator(); alfo.frequency.value = 0.06 + i * 0.015;
-      var alfoG = ctx.createGain(); alfoG.gain.value = 0.012;
+      // slow amplitude swell — each voice fades up and down independently
+      var alfo = ctx.createOscillator(); alfo.frequency.value = 0.045 + i * 0.02;
+      var alfoG = ctx.createGain(); alfoG.gain.value = 0.02;
       alfo.connect(alfoG); alfoG.connect(g.gain);
+      g.gain.setValueAtTime(0.0001, now());
+      g.gain.exponentialRampToValueAtTime(0.028, now() + 6 + i * 2);
       o.connect(lp); lp.connect(g); g.connect(musicBus);
       o.start(); lfo.start(); alfo.start();
       ambientNodes.push(o, lfo, alfo);
     });
-    // warm sub-bass foundation
-    var sub = ctx.createOscillator(); sub.type = 'sine'; sub.frequency.value = 65.41;
-    var sg = ctx.createGain(); sg.gain.value = 0.05; sub.connect(sg); sg.connect(musicBus); sub.start();
-    ambientNodes.push(sub);
 
-    // occasional distant high bell-chime — sparse, very quiet shimmer
+    // sparse, gentle high bell-chimes with reverb — the only moving element
     ambientTimer = setInterval(function () {
       if (!musicOn || !enabled || !ctx) return;
-      if (Math.random() < 0.45) {
-        var notes = [1047, 1319, 1568, 2093];
+      if (Math.random() < 0.3) {
+        var notes = [523.25, 659.25, 784.0, 1047.0];
         var n = notes[Math.floor(Math.random() * notes.length)];
-        var dest = echoSend(0.45, 0.5, 0.4);
-        tone({ freq: n, type: 'sine', dur: 0.9, gain: 0.04, dest: dest,
-               filter: { type: 'lowpass', freq: 5000 } });
+        var dest = echoSend(0.5, 0.45, 0.35);
+        tone({ freq: n, type: 'sine', dur: 1.4, gain: 0.03, attack: 0.25, dest: dest,
+               filter: { type: 'lowpass', freq: 4000 } });
       }
-    }, 5200);
+    }, 7000);
   }
 
   function stopAmbient() {

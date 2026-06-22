@@ -1,8 +1,17 @@
 /* ui.css — sidebar (dock/log/chat), controls, modals, toasts, overlays. */
 
-/* ---- sidebar ---- */
+/* ---- panels (three-column game layout) ---- */
+.panel{background:var(--card);border:1px solid var(--border2);border-radius:14px;padding:.7rem;display:flex;flex-direction:column;min-height:0;backdrop-filter:blur(8px)}
+.panel.grow{flex:1}
+.panel-h{font-family:var(--disp);font-size:.7rem;letter-spacing:.09em;color:var(--dim);text-transform:uppercase;margin:0 0 .5rem}
+.full{width:100%}
+.share-box{gap:.5rem}
+.room-line{display:flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.72rem;color:var(--dim)}
+.room-line code{font-family:var(--mono);font-size:1.05rem;letter-spacing:.22em;color:var(--gold);background:var(--card2);border:1px solid var(--border2);padding:.12rem .55rem;border-radius:7px}
+.chat-panel{min-height:0}
+.right-tabs{display:flex;gap:.3rem;margin-bottom:.5rem}
 #sidebar{display:flex;flex-direction:column;min-height:0;gap:.6rem}
-.dock{display:flex;flex-direction:column;gap:.4rem;overflow:auto;max-height:42vh;padding-right:2px}
+.dock{display:flex;flex-direction:column;gap:.4rem;overflow:auto;max-height:40vh;padding-right:2px;min-height:0}
 .pcard{display:flex;align-items:center;gap:.55rem;background:var(--card2);border:1px solid var(--border2);border-left:3px solid var(--pc,var(--glow));
   border-radius:10px;padding:.45rem .6rem;position:relative}
 .pcard.turn{box-shadow:0 0 0 1px var(--gold),0 0 16px -4px var(--gold)}
@@ -34,8 +43,8 @@
 .my-props{padding:.5rem;overflow:auto;display:flex;flex-direction:column;gap:.4rem}
 
 /* ---- controls bar ---- */
-.controls{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;justify-content:center;padding:.7rem 1rem;
-  background:var(--card2);border-top:1px solid var(--border);min-height:60px}
+.controls{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;justify-content:center;padding:.7rem .9rem;
+  width:min(100%,860px);background:var(--card2);border:1px solid var(--border);border-radius:14px;min-height:58px;box-shadow:var(--shadow)}
 .controls .spacer{flex:1}
 .controls button{padding:.6rem 1rem;border-radius:11px;font-size:.85rem;font-weight:600}
 .controls .hint{font-family:var(--mono);font-size:.8rem;color:var(--dim)}

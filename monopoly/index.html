@@ -60,6 +60,7 @@
 
       <footer class="home-foot">
         <button id="sound-toggle" class="ghost" aria-pressed="true">🔊 Sound on</button>
+        <button id="music-toggle" class="ghost" aria-pressed="false">🎵 Music off</button>
         <a class="link" href="/">← back to the arcade</a>
       </footer>
       <p id="home-msg" class="msg" role="status"></p>
@@ -102,37 +103,50 @@
 
   <!-- ============================ GAME ============================ -->
   <section id="screen-game" class="screen">
-    <div class="game-layout">
-      <div id="board-wrap">
-        <div id="board" role="img" aria-label="game board"></div>
-        <div id="tokens" aria-hidden="true"></div>
-        <div id="board-center">
-          <div class="center-brand">TYCOON</div>
-          <div id="pot" class="pot" hidden></div>
-          <div id="turn-banner" class="turn-banner"></div>
-          <div id="dice" class="dice"><span class="die" data-d="1"></span><span class="die" data-d="1"></span></div>
-          <div id="action-card" class="action-card"></div>
+    <div class="game-grid">
+      <!-- LEFT: share + chat -->
+      <aside class="col col-left">
+        <div class="panel share-box">
+          <div class="room-line"><span class="lbl">Room</span><code id="game-code">----</code></div>
+          <button id="game-copy" class="ghost sm full">📋 Copy invite link</button>
         </div>
+        <div class="panel chat-panel grow">
+          <div class="panel-h">Chat</div>
+          <ul id="chat" class="chat"></ul>
+          <div id="reactions-bar" class="reactions-bar"></div>
+          <div class="chat-in"><input id="chat-input" maxlength="200" placeholder="Say something…" /><button id="chat-send" class="ghost sm">Send</button></div>
+        </div>
+      </aside>
+
+      <!-- CENTER: board + controls -->
+      <div class="col col-center">
+        <div id="board-wrap">
+          <div id="board" role="img" aria-label="game board"></div>
+          <div id="tokens" aria-hidden="true"></div>
+          <div id="board-center">
+            <div class="center-brand">TYCOON</div>
+            <div id="pot" class="pot" hidden></div>
+            <div id="turn-banner" class="turn-banner"></div>
+            <div id="dice" class="dice"><span class="die" data-d="1"></span><span class="die" data-d="1"></span></div>
+            <div id="action-card" class="action-card"></div>
+          </div>
+        </div>
+        <div id="controls" class="controls"></div>
       </div>
 
-      <aside id="sidebar">
-        <div id="dock" class="dock"></div>
-        <div class="side-tabs">
-          <button class="tab on" data-tab="log">Log</button>
-          <button class="tab" data-tab="chat">Chat</button>
-          <button class="tab" data-tab="props">My properties</button>
+      <!-- RIGHT: players + log/properties -->
+      <aside class="col col-right">
+        <div class="panel"><div class="panel-h">Players <span id="dock-count" class="dim"></span></div><div id="dock" class="dock"></div></div>
+        <div class="panel grow">
+          <div class="right-tabs">
+            <button class="tab on" data-tab="log">Log</button>
+            <button class="tab" data-tab="props">My properties</button>
+          </div>
+          <div id="tab-log" class="tab-pane on"><ul id="log" class="log"></ul></div>
+          <div id="tab-props" class="tab-pane"><div id="my-props" class="my-props"></div></div>
         </div>
-        <div id="tab-log" class="tab-pane on"><ul id="log" class="log"></ul></div>
-        <div id="tab-chat" class="tab-pane">
-          <ul id="chat" class="chat"></ul>
-          <div class="chat-in"><input id="chat-input" maxlength="200" placeholder="Say something…" /><button id="chat-send" class="ghost sm">Send</button></div>
-          <div id="reactions-bar" class="reactions-bar"></div>
-        </div>
-        <div id="tab-props" class="tab-pane"><div id="my-props" class="my-props"></div></div>
       </aside>
     </div>
-
-    <div id="controls" class="controls"></div>
 
     <button id="game-menu-btn" class="game-menu-btn" title="Menu">☰</button>
   </section>
