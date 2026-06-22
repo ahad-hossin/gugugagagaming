@@ -21,6 +21,10 @@ body{
 button{font-family:var(--body);cursor:pointer}
 input{font-family:var(--body)}
 :focus-visible{outline:2px solid var(--glow);outline-offset:2px;border-radius:8px}
+/* the [hidden] attr must win over elements given an explicit display below
+   (#modal-root, #card-overlay, #emoji-pop, #resume-bar, etc.) — without this
+   those full-screen blur overlays sit on top of the page permanently. */
+[hidden]{display:none!important}
 .dim{color:var(--dim)} .sm{font-size:.78rem}
 .msg{font-family:var(--mono);font-size:.8rem;color:var(--gold);min-height:1.2em;margin:.4rem 0 0;text-align:center}
 
