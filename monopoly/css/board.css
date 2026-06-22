@@ -18,30 +18,51 @@
 #board{position:absolute;inset:0;display:grid;grid-template-columns:repeat(11,1fr);grid-template-rows:repeat(11,1fr);gap:2px;
   background:rgba(8,16,32,.6);border:1px solid var(--border);border-radius:14px;padding:2px;
   box-shadow:var(--shadow),inset 0 0 40px rgba(0,0,0,.4)}
-.tile{position:relative;background:var(--card2);border:1px solid var(--border2);border-radius:5px;
-  display:flex;flex-direction:column;overflow:hidden;min-width:0;font-size:.5rem;line-height:1.05;cursor:pointer;
+.tile{position:relative;background:linear-gradient(180deg,rgba(20,34,60,.82),rgba(10,19,38,.92));
+  border:1px solid var(--border2);border-radius:4px;overflow:hidden;min-width:0;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1px;
   transition:box-shadow .2s,transform .12s}
-.tile:hover{transform:scale(1.04);z-index:5;box-shadow:0 6px 18px rgba(0,0,0,.5)}
-.tile .bar{height:18%;min-height:7px;width:100%}
-.tile .nm{padding:2px 3px;font-family:var(--mono);font-size:.46rem;color:var(--text);font-weight:600;overflow:hidden}
-.tile .pr{margin-top:auto;padding:1px 3px 2px;font-family:var(--mono);font-size:.46rem;color:var(--gold)}
-.tile.corner{font-size:.55rem;align-items:center;justify-content:center;text-align:center;padding:3px}
-.tile.corner .ico{font-size:1.1rem}
-.tile.corner .cap{font-family:var(--disp);font-size:.42rem;letter-spacing:.08em;color:var(--dim);margin-top:2px}
-.tile.special{align-items:center;justify-content:center;text-align:center}
-.tile.special .ico{font-size:1rem}
-.tile.special .nm{text-align:center;font-size:.42rem}
+.tile:hover{transform:scale(1.06);z-index:5;box-shadow:0 8px 22px rgba(0,0,0,.6)}
+
+/* colour strip on the INNER edge (facing the board centre) */
+.tile .bar{position:absolute;box-shadow:inset 0 0 0 1px rgba(0,0,0,.22)}
+.tile.edge-b .bar{top:0;left:0;right:0;height:22%}
+.tile.edge-t .bar{bottom:0;left:0;right:0;height:22%}
+.tile.edge-l .bar{top:0;bottom:0;right:0;width:22%}
+.tile.edge-r .bar{top:0;bottom:0;left:0;width:22%}
+.tile.edge-b{padding:24% 2px 3px}
+.tile.edge-t{padding:3px 2px 24%}
+.tile.edge-l{padding:3px 24% 3px 3px}
+.tile.edge-r{padding:3px 3px 3px 24%}
+
+.tile .nm{font-family:var(--mono);font-weight:700;color:var(--text);font-size:.5rem;line-height:1.08;
+  overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3}
+.tile .pr{font-family:var(--mono);font-size:.48rem;color:var(--gold);margin-top:1px}
+
+.tile.corner{padding:3px;background:linear-gradient(180deg,rgba(26,44,74,.92),rgba(12,22,42,.96))}
+.tile.corner .ico{font-size:1.4rem;line-height:1}
+.tile.corner .cap{font-family:var(--disp);font-size:.42rem;letter-spacing:.05em;color:var(--dim);margin-top:3px}
+.tile.special{padding:2px}
+.tile.special .ico{font-size:1.05rem;line-height:1}
+.tile.special .nm{font-size:.44rem;color:var(--dim);-webkit-line-clamp:2}
 
 /* ownership glow + house pips + mortgage */
-.tile.owned{border-color:var(--own,var(--glow));box-shadow:0 0 0 1px var(--own,var(--glow)),0 0 12px -2px var(--own,var(--glow))}
-.tile .ownerdot{position:absolute;top:2px;right:2px;width:8px;height:8px;border-radius:50%;background:var(--own,#fff);box-shadow:0 0 6px var(--own,#fff)}
-.tile .houses{position:absolute;top:1px;left:0;width:100%;display:flex;gap:1px;justify-content:center;pointer-events:none}
-.tile .houses i{width:5px;height:5px;border-radius:1px;background:var(--good);box-shadow:0 0 4px var(--good)}
-.tile .houses i.hotel{width:9px;background:var(--bad);box-shadow:0 0 5px var(--bad)}
-.tile.mortgaged{opacity:.5}
-.tile.mortgaged::after{content:"M";position:absolute;inset:0;display:grid;place-items:center;font-family:var(--disp);font-size:1rem;color:var(--bad);background:rgba(0,0,0,.35)}
+.tile.owned{border-color:var(--own,var(--glow));box-shadow:inset 0 0 0 1px var(--own,var(--glow)),0 0 10px -3px var(--own,var(--glow))}
+.tile .ownerdot{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--own,#fff);box-shadow:0 0 6px var(--own,#fff)}
+.tile.edge-b .ownerdot{bottom:2px;right:2px}.tile.edge-t .ownerdot{top:2px;right:2px}
+.tile.edge-l .ownerdot{left:2px;bottom:2px}.tile.edge-r .ownerdot{right:2px;bottom:2px}
+.tile.corner .ownerdot,.tile.special .ownerdot{top:2px;right:2px}
+.tile .houses{position:absolute;display:flex;gap:1px;justify-content:center;align-items:center;pointer-events:none}
+.tile.edge-b .houses{top:0;left:0;right:0;height:22%}
+.tile.edge-t .houses{bottom:0;left:0;right:0;height:22%}
+.tile.edge-l .houses{top:0;bottom:0;right:0;width:22%;flex-direction:column}
+.tile.edge-r .houses{top:0;bottom:0;left:0;width:22%;flex-direction:column}
+.tile .houses i{width:5px;height:5px;border-radius:1px;background:#2fd06a;box-shadow:0 0 3px #2fd06a}
+.tile .houses i.hotel{width:9px;height:5px;background:var(--bad);box-shadow:0 0 4px var(--bad)}
+.tile.mortgaged{opacity:.45;filter:grayscale(.6)}
+.tile.mortgaged::after{content:"MORTGAGED";position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-size:.4rem;letter-spacing:.04em;color:var(--bad);background:rgba(0,0,0,.45);transform:rotate(-12deg)}
 .tile.flash{animation:tileflash 1.1s ease}
-@keyframes tileflash{0%,100%{box-shadow:0 0 0 1px var(--own,var(--glow))}50%{box-shadow:0 0 0 3px var(--gold),0 0 22px var(--gold)}}
+@keyframes tileflash{0%,100%{box-shadow:inset 0 0 0 1px var(--own,var(--glow))}50%{box-shadow:inset 0 0 0 2px var(--gold),0 0 22px var(--gold)}}
 
 /* ---- centre ---- */
 #board-center{position:absolute;left:calc(100%/11);top:calc(100%/11);width:calc(100%*9/11);height:calc(100%*9/11);

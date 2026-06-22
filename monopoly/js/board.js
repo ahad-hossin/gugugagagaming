@@ -19,6 +19,14 @@
     if (i === 30) return { r: 1, c: 11 };
     return { r: i - 29, c: 11 };
   }
+  // which board edge a tile sits on — drives the inner-edge colour strip
+  function edgeClass(i) {
+    if (i === 0 || i === 10 || i === 20 || i === 30) return 'corner';
+    if (i < 10) return 'edge-b';
+    if (i < 20) return 'edge-l';
+    if (i < 30) return 'edge-t';
+    return 'edge-r';
+  }
   function groupColor(g) { return GROUPS[g] ? GROUPS[g].color : 'var(--border)'; }
   function abbrev(name) { return name.length > 16 ? name.slice(0, 15) + '…' : name; }
 
@@ -41,7 +49,8 @@
     board.innerHTML = ''; tileEls = [];
     TILES.forEach(function (t) {
       var p = gridPos(t.i);
-      var cls = 'tile' + (CORNER[t.i] ? ' corner' : (t.type === 'street' || t.type === 'rail' || t.type === 'utility' ? '' : ' special'));
+      var cls = 'tile ' + edgeClass(t.i);
+      if (!CORNER[t.i] && !(t.type === 'street' || t.type === 'rail' || t.type === 'utility')) cls += ' special';
       var e = UI.el('div', cls);
       e.style.gridRow = p.r; e.style.gridColumn = p.c;
       e.setAttribute('data-tile', t.i);
