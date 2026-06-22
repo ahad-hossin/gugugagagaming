@@ -1,0 +1,191 @@
+/* ==========================================================================
+   themes.css — Per-theme palettes (CSS custom properties) + decorative layers.
+   The structure in styles.css stays identical; only these variables and the
+   ambient overlays change. Switching [data-theme] hot-swaps the whole look.
+   ========================================================================== */
+
+/* shared scope decoration (re-skinned per theme via vars) */
+.sonar-sweep {
+  /* fallback for engines without color-mix() support */
+  background: conic-gradient(from 0deg, var(--ping) 0deg, transparent 50deg, transparent 360deg);
+  background: conic-gradient(from 0deg,
+    var(--ping) 0deg, color-mix(in srgb, var(--ping) 40%, transparent) 18deg,
+    transparent 55deg, transparent 360deg);
+  -webkit-mask: radial-gradient(circle at center, #000 12%, transparent 72%);
+          mask: radial-gradient(circle at center, #000 12%, transparent 72%);
+  mix-blend-mode: screen; border-radius: 50%;
+  animation: sweep 4.2s linear infinite;
+}
+@keyframes sweep { to { transform: rotate(360deg); } }
+body[data-phase="battle"] .sonar-sweep { opacity: var(--sweep-opacity, 0); }
+
+.range-rings {
+  background:
+    radial-gradient(circle at center, transparent 0 30%, var(--ring-col) 30% calc(30% + 1px), transparent calc(30% + 1px)),
+    radial-gradient(circle at center, transparent 0 52%, var(--ring-col) 52% calc(52% + 1px), transparent calc(52% + 1px)),
+    radial-gradient(circle at center, transparent 0 74%, var(--ring-col) 74% calc(74% + 1px), transparent calc(74% + 1px));
+  opacity: var(--rings-opacity, 0);
+}
+
+/* =====================================================================
+   ABYSSAL SONAR (default)
+   ===================================================================== */
+body[data-theme="abyss"] {
+  --bg: #03070d; --bg-2: #06121c; --panel: #081822;
+  --water: #0a2630; --water-hi: #0e3640;
+  --grid-line: #0e3a42; --grid-line-bright: #1c6b72; --ring-col: rgba(28,107,114,0.4);
+  --ping: #2ff6e0; --ping-core: #a8fff4;
+  --miss: #3a7c8c; --miss-soft: rgba(58,124,140,0.6);
+  --hit: #ff7a33; --hit-core: #ffe6c7; --hit-bg: rgba(255,122,51,0.16); --hit-soft: rgba(255,122,51,0.5);
+  --sunk: #e23838; --sunk-core: #ffe6c7; --sunk-bg: rgba(122,20,20,0.4); --sunk-soft: rgba(226,56,56,0.5);
+  --accent: #2ff6e0; --accent-2: #46e8b0; --accent-soft: rgba(47,246,224,0.35); --accent-faint: rgba(47,246,224,0.1);
+  --bad: #b33a3a; --bad-faint: rgba(179,58,58,0.25);
+  --text: #cdeff0; --text-dim: #5e8a90;
+  --hud-glass: rgba(12,30,40,0.7); --hud-border: #1c6b72;
+  --ship: #123b46; --ship-edge: #2ff6e0;
+  --btn-on-accent: #03121a;
+  --font-display: 'Orbitron', 'Eurostile', sans-serif;
+  --font-mono: 'Space Mono', 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --scope-radius: 50%; --board-radius: 6px; --cell-radius: 3px; --scope-pad: 7%;
+  --sweep-opacity: 0.22; --rings-opacity: 1;
+}
+body[data-theme="abyss"] .board-scope {
+  background: radial-gradient(circle at center, #08161e 0%, #050d14 75%);
+  border-radius: 50%; box-shadow: inset 0 0 60px rgba(0,0,0,0.8), 0 0 50px rgba(0,0,0,0.6), 0 0 0 1px var(--hud-border);
+}
+body[data-theme="abyss"] #caustics {
+  background: linear-gradient(180deg, rgba(47,246,224,0.07), transparent 38%);
+  animation: causticDrift 9s ease-in-out infinite alternate;
+}
+@keyframes causticDrift { from { opacity: 0.6; transform: translateY(-4px); } to { opacity: 1; transform: translateY(4px); } }
+body[data-theme="abyss"] #vignette {
+  background: radial-gradient(circle at center, transparent 45%, rgba(0,0,0,0.55) 100%);
+  animation: pressureBreath 7s ease-in-out infinite;
+}
+@keyframes pressureBreath { 0%,100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+body[data-theme="abyss"] #crt-overlay { display: none; }
+
+/* =====================================================================
+   WAR ROOM 1962
+   ===================================================================== */
+body[data-theme="warroom"] {
+  --bg: #0a0e08; --bg-2: #141a12; --panel: #11160e;
+  --water: #0c1c12; --water-hi: #123018;
+  --grid-line: #2a5e33; --grid-line-bright: #33ff66; --ring-col: rgba(51,255,102,0.25);
+  --ping: #7cffb0; --ping-core: #d6ffe6;
+  --miss: #6fe0ff; --miss-soft: rgba(111,224,255,0.5);
+  --hit: #ff6a2b; --hit-core: #ffd9a0; --hit-bg: rgba(255,106,43,0.18); --hit-soft: rgba(255,106,43,0.6);
+  --sunk: #e01818; --sunk-core: #ffe; --sunk-bg: rgba(140,42,18,0.5); --sunk-soft: rgba(224,24,24,0.6);
+  --accent: #33ff66; --accent-2: #ffb000; --accent-soft: rgba(51,255,102,0.4); --accent-faint: rgba(51,255,102,0.1);
+  --bad: #e01818; --bad-faint: rgba(224,24,24,0.28);
+  --text: #33ff66; --text-dim: #1f8f3d;
+  --hud-glass: rgba(20,26,18,0.8); --hud-border: #2a5e33;
+  --ship: #15301c; --ship-edge: #33ff66;
+  --btn-on-accent: #06120a;
+  --font-display: 'Black Ops One', 'Stardos Stencil', 'Courier New', monospace;
+  --font-mono: 'VT323', 'Share Tech Mono', 'IBM Plex Mono', monospace;
+  --font-body: 'Share Tech Mono', 'VT323', monospace;
+  --scope-radius: 12px; --board-radius: 4px; --cell-radius: 1px; --scope-pad: 8%;
+  --sweep-opacity: 0.3; --rings-opacity: 0.7;
+}
+body[data-theme="warroom"] { text-shadow: 0 0 4px currentColor; }
+body[data-theme="warroom"] .game-title, body[data-theme="warroom"] .turn-indicator,
+body[data-theme="warroom"] .board-title { text-shadow: 0 0 6px currentColor, 0 0 14px currentColor; }
+body[data-theme="warroom"] .board-scope {
+  background: radial-gradient(circle at center, #0c1c12 0%, #060c08 80%);
+  border-radius: 12px; box-shadow: inset 0 0 40px rgba(0,0,0,0.7), 0 0 0 2px #2a5e33, 0 0 30px rgba(51,255,102,0.15);
+}
+body[data-theme="warroom"] #caustics { display: none; }
+body[data-theme="warroom"] #vignette { background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.6) 100%); }
+body[data-theme="warroom"] #crt-overlay {
+  display: block;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 1px, transparent 1px, transparent 3px);
+  animation: crtFlicker 0.12s steps(2) infinite;
+}
+body[data-theme="warroom"] #crt-overlay .crt-roll {
+  position: absolute; left: 0; right: 0; height: 16%;
+  background: linear-gradient(180deg, transparent, rgba(120,255,160,0.05), transparent);
+  animation: crtRoll 7s linear infinite;
+}
+@keyframes crtFlicker { 0% { opacity: 0.85; } 100% { opacity: 1; } }
+@keyframes crtRoll { from { top: -20%; } to { top: 120%; } }
+
+/* =====================================================================
+   HOLO COMMAND
+   ===================================================================== */
+body[data-theme="holo"] {
+  --bg: #05060e; --bg-2: #0a1326; --panel: #0c1730;
+  --water: #0c2238; --water-hi: #103052;
+  --grid-line: #1f4e6e; --grid-line-bright: #3df5ff; --ring-col: rgba(61,245,255,0.22);
+  --ping: #3df5ff; --ping-core: #d6f4ff;
+  --miss: #5c7c9e; --miss-soft: rgba(92,124,158,0.6);
+  --hit: #ffb347; --hit-core: #fff3d6; --hit-bg: rgba(255,179,71,0.16); --hit-soft: rgba(255,179,71,0.55);
+  --sunk: #8a4dff; --sunk-core: #fff; --sunk-bg: rgba(138,77,255,0.22); --sunk-soft: rgba(138,77,255,0.55);
+  --accent: #3df5ff; --accent-2: #ff3dee; --accent-soft: rgba(61,245,255,0.35); --accent-faint: rgba(61,245,255,0.1);
+  --bad: #ff4d5e; --bad-faint: rgba(255,77,94,0.25);
+  --text: #d6f4ff; --text-dim: #6e8fb0;
+  --hud-glass: rgba(14,27,51,0.6); --hud-border: #2e5c8a;
+  --ship: rgba(61,245,255,0.16); --ship-edge: #3df5ff;
+  --btn-on-accent: #04111a;
+  --font-display: 'Orbitron', 'Eurostile', sans-serif;
+  --font-mono: 'Share Tech Mono', 'JetBrains Mono', ui-monospace, monospace;
+  --font-body: 'Chakra Petch', 'Rajdhani', system-ui, sans-serif;
+  --scope-radius: 18px; --board-radius: 12px; --cell-radius: 5px; --scope-pad: 6%;
+  --sweep-opacity: 0.18; --rings-opacity: 0.5;
+}
+body[data-theme="holo"] .game-title { text-shadow: 3px 0 var(--accent-2), -3px 0 var(--accent), 0 0 24px var(--accent-soft); }
+body[data-theme="holo"] .board-scope {
+  background: linear-gradient(160deg, rgba(14,27,51,0.7), rgba(8,16,33,0.5));
+  border-radius: 18px; backdrop-filter: blur(8px) saturate(140%); -webkit-backdrop-filter: blur(8px) saturate(140%);
+  border: 1px solid var(--hud-border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 0 40px rgba(61,245,255,0.16), 0 20px 60px rgba(0,0,0,0.6);
+}
+body[data-theme="holo"] #caustics { background: radial-gradient(circle at 30% 10%, rgba(61,245,255,0.06), transparent 40%), radial-gradient(circle at 80% 90%, rgba(255,61,238,0.05), transparent 40%); }
+body[data-theme="holo"] #vignette { background: radial-gradient(circle at center, transparent 55%, rgba(0,0,0,0.5) 100%); }
+body[data-theme="holo"] #crt-overlay { display: none; }
+body[data-theme="holo"] .sonar-sweep { mix-blend-mode: screen; }
+
+/* =====================================================================
+   ORIGAMI ARMADA
+   ===================================================================== */
+body[data-theme="origami"] {
+  --bg: #c9b79c; --bg-2: #d9cab1; --panel: #f4eddc;
+  --water: #f4eddc; --water-hi: #eae0c9;
+  --grid-line: #a9c4d4; --grid-line-bright: #7fa6bc; --ring-col: rgba(127,166,188,0.3);
+  --ping: #c9a24b; --ping-core: #e3b54a;
+  --miss: #2e5a7a; --miss-soft: rgba(46,90,122,0.5);
+  --hit: #d86a2c; --hit-core: #ffd9a0; --hit-bg: rgba(216,106,44,0.18); --hit-soft: rgba(216,106,44,0.5);
+  --sunk: #a23b2e; --sunk-core: #fff; --sunk-bg: rgba(162,59,46,0.2); --sunk-soft: rgba(162,59,46,0.5);
+  --accent: #c9a24b; --accent-2: #d86a2c; --accent-soft: rgba(201,162,75,0.4); --accent-faint: rgba(201,162,75,0.15);
+  --bad: #a23b2e; --bad-faint: rgba(162,59,46,0.2);
+  --text: #23303b; --text-dim: #4f4233;
+  --hud-glass: rgba(244,237,220,0.8); --hud-border: #c2b49a;
+  --ship: #fbf7ec; --ship-edge: #23303b;
+  --btn-on-accent: #23303b;            /* dark ink — readable on gold/orange */
+  --accent-text: #7a5c14;              /* dark brass for emphasis text on paper */
+  --focus-ring: #23303b;
+  --font-display: 'Caveat', 'Shantell Sans', 'Comic Sans MS', cursive;
+  --font-mono: 'Patrick Hand', 'Gloria Hallelujah', cursive;
+  --font-body: 'Architects Daughter', 'Patrick Hand', cursive;
+  --scope-radius: 4px; --board-radius: 2px; --cell-radius: 1px; --scope-pad: 9%;
+  --sweep-opacity: 0; --rings-opacity: 0;
+}
+body[data-theme="origami"] { background: repeating-linear-gradient(45deg, #c9b79c, #c9b79c 12px, #c5b395 12px, #c5b395 24px); }
+body[data-theme="origami"] .game-title { transform: rotate(-1.5deg); font-weight: 700; }
+body[data-theme="origami"] .board-scope {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 calc(10% - 1px), var(--grid-line) calc(10% - 1px) 10%),
+    repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), var(--grid-line) calc(10% - 1px) 10%),
+    #f4eddc;
+  border-radius: 4px; box-shadow: 0 8px 24px rgba(0,0,0,0.3), inset 0 0 0 1px #c2b49a;
+}
+body[data-theme="origami"] .cell { border-color: transparent; }
+body[data-theme="origami"] .board.is-target .cell:hover { box-shadow: inset 0 0 0 2px var(--accent); }
+body[data-theme="origami"] .cell.ship { border-radius: 2px; box-shadow: inset 0 0 0 2px var(--ship-edge); }
+body[data-theme="origami"] .cell.sunk::after { content: "✗"; font-weight: 700; color: var(--sunk); text-shadow: none; }
+body[data-theme="origami"] #caustics, body[data-theme="origami"] #crt-overlay { display: none; }
+body[data-theme="origami"] #vignette { background: radial-gradient(circle at center, transparent 60%, rgba(60,40,20,0.18) 100%); }
+body[data-theme="origami"] .turn-indicator,
+body[data-theme="origami"] .board-title { transform: rotate(-0.6deg); }

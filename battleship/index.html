@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <base href="/battleship/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#03070D" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2303070d'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%232ff6e0' stroke-width='1.5' opacity='.5'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='%232ff6e0' stroke-width='1.5' opacity='.8'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%23a8fff4'/%3E%3Cpath d='M16 16 L26 9' stroke='%232ff6e0' stroke-width='1.5'/%3E%3C/svg%3E" />
+  <title>SONAR — A Battleship Game</title>
+  <meta name="description" content="A unique, audio-first Battleship game. Hunt the enemy fleet by sound in four hand-crafted themes." />
+
+  <!-- Theme fonts (graceful system fallbacks if offline) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;600&family=Chakra+Petch:wght@400;500;700&family=Rajdhani:wght@500;700&family=VT323&family=Black+Ops+One&family=Share+Tech+Mono&family=Special+Elite&family=Caveat:wght@500;700&family=Patrick+Hand&family=Architects+Daughter&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/themes.css" />
+</head>
+<body data-theme="abyss" data-phase="title" data-turn="human">
+
+  <!-- ambient + transient effect canvases -->
+  <canvas id="fx-bg" aria-hidden="true"></canvas>
+  <div id="caustics" aria-hidden="true"></div>
+  <div id="crt-overlay" aria-hidden="true"><div class="crt-roll"></div></div>
+  <div id="vignette" aria-hidden="true"></div>
+  <canvas id="fx-fg" aria-hidden="true"></canvas>
+
+  <!-- top bar -->
+  <header class="topbar">
+    <button class="brand" data-act="home" aria-label="Home">
+      <span class="brand-mark" aria-hidden="true">◎</span>
+      <span class="brand-name" id="brand-name">SONAR</span>
+    </button>
+    <div class="top-actions">
+      <span class="status-chip" id="theme-chip" title="Current theme"></span>
+      <button class="icon-btn" data-act="sound" id="btn-sound" aria-label="Toggle sound" aria-pressed="true">
+        <span class="ico" data-ico="sound">🔊</span>
+      </button>
+      <button class="icon-btn" data-act="settings" aria-label="Settings">⚙</button>
+      <button class="icon-btn" data-act="howto" aria-label="How to play">?</button>
+    </div>
+  </header>
+
+  <!-- ================= TITLE SCREEN ================= -->
+  <section id="screen-title" class="screen is-active" aria-label="Main menu">
+    <div class="title-inner">
+      <h1 class="game-title" id="game-title" data-text="SONAR">SONAR</h1>
+      <p class="tagline" id="game-tagline">Hunt by sound in the bioluminescent deep.</p>
+
+      <div class="title-actions">
+        <button class="btn btn-primary btn-lg" data-act="play">
+          <span class="btn-key">▶</span><span id="play-label">Dive In</span>
+        </button>
+        <button class="btn btn-lg" data-act="online"><span class="btn-key">⚓</span> Play a Friend</button>
+        <button class="btn" data-act="howto">How to Play</button>
+        <button class="btn" data-act="settings">Customize</button>
+      </div>
+
+      <div class="theme-strip" role="radiogroup" aria-label="Theme">
+        <div class="theme-strip-label">Theme</div>
+        <div class="theme-chips" id="title-themes"></div>
+      </div>
+
+      <dl class="lifetime-stats" id="lifetime-stats" aria-label="Lifetime record"></dl>
+    </div>
+  </section>
+
+  <!-- ================= GAME SCREEN ================= -->
+  <main id="screen-game" class="screen" aria-label="Battle">
+    <!-- phase banner / turn indicator -->
+    <div class="hud-bar">
+      <div class="turn-indicator" id="turn-indicator">
+        <span class="turn-dot" aria-hidden="true"></span>
+        <span id="turn-text">Place your fleet</span>
+      </div>
+      <div class="hud-readout" id="hud-readout"></div>
+    </div>
+
+    <div class="boards">
+      <!-- PLAYER -->
+      <section class="board-wrap" id="wrap-player">
+        <header class="board-head">
+          <h2 class="board-title">Your Waters</h2>
+          <span class="turn-tag" aria-hidden="true"></span>
+          <div class="fleet-pips" id="fleet-player" aria-label="Your fleet status"></div>
+        </header>
+        <div class="board-scope">
+          <div class="range-rings" aria-hidden="true"></div>
+          <div class="sonar-sweep" aria-hidden="true"></div>
+          <div class="board" id="board-player" role="group" aria-label="Your fleet grid"></div>
+        </div>
+      </section>
+
+      <!-- ENEMY -->
+      <section class="board-wrap" id="wrap-enemy">
+        <header class="board-head">
+          <h2 class="board-title">Enemy Waters</h2>
+          <span class="turn-tag" aria-hidden="true"></span>
+          <div class="fleet-pips" id="fleet-enemy" aria-label="Enemy fleet status"></div>
+        </header>
+        <div class="board-scope">
+          <div class="range-rings" aria-hidden="true"></div>
+          <div class="sonar-sweep" aria-hidden="true"></div>
+          <div class="board" id="board-enemy" role="group" aria-label="Enemy waters grid — fire here"></div>
+          <div class="board-fog" aria-hidden="true"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- placement controls -->
+    <div class="placement-bar" id="placement-bar">
+      <div class="ship-tray" id="ship-tray" role="group" aria-label="Ships to place"></div>
+      <div class="placement-actions">
+        <button class="btn" data-act="rotate"><span class="btn-key">R</span> Rotate</button>
+        <button class="btn" data-act="randomize"><span class="btn-key">⤮</span> Auto-Place</button>
+        <button class="btn" data-act="clear-place">Clear</button>
+        <button class="btn btn-primary" data-act="start" id="btn-start" disabled>Start Battle</button>
+      </div>
+    </div>
+
+    <!-- ability bar (shown in battle when ability mode is on) -->
+    <div class="ability-bar" id="ability-bar" aria-label="Abilities">
+      <button class="ability" data-ability="sonar" aria-label="Sonar pulse — scan a 3 by 3 area">
+        <span class="ab-ico" aria-hidden="true">📡</span><span class="ab-name">Sonar</span><span class="ab-charge">×2</span>
+      </button>
+      <button class="ability" data-ability="barrage" aria-label="Artillery barrage — bomb a 3 by 3 area">
+        <span class="ab-ico" aria-hidden="true">💥</span><span class="ab-name">Barrage</span><span class="ab-charge">×1</span>
+      </button>
+      <button class="ability" data-ability="torpedo" aria-label="Torpedo run — fire a full row or column">
+        <span class="ab-ico" aria-hidden="true">🚀</span><span class="ab-name">Torpedo</span><span class="ab-charge">×1</span>
+      </button>
+    </div>
+
+    <!-- action log -->
+    <div class="log-wrap">
+      <div class="log-title">Battle Log</div>
+      <ol class="log" id="log" aria-label="Battle log"></ol>
+    </div>
+  </main>
+
+  <!-- ================= SETTINGS DRAWER ================= -->
+  <aside id="settings" class="drawer" aria-label="Settings" aria-hidden="true">
+    <div class="drawer-head">
+      <h2>Customize</h2>
+      <button class="icon-btn" data-act="close-settings" aria-label="Close settings">✕</button>
+    </div>
+    <div class="drawer-body">
+
+      <div class="setting-group">
+        <h3>Theme</h3>
+        <div class="theme-chips" id="settings-themes" role="radiogroup" aria-label="Theme"></div>
+      </div>
+
+      <div class="setting-group">
+        <h3>Board Size</h3>
+        <div class="seg" id="seg-size" role="radiogroup" aria-label="Board size">
+          <button class="seg-btn" role="radio" aria-checked="false" data-size="8">8 × 8</button>
+          <button class="seg-btn" role="radio" aria-checked="false" data-size="10">10 × 10</button>
+          <button class="seg-btn" role="radio" aria-checked="false" data-size="12">12 × 12</button>
+        </div>
+        <p class="setting-note">Changing size starts a new game.</p>
+      </div>
+
+      <div class="setting-group">
+        <h3>Fleet</h3>
+        <div class="seg seg-wrap" id="seg-fleet" role="radiogroup" aria-label="Fleet preset">
+          <button class="seg-btn" role="radio" aria-checked="false" data-fleet="skirmish">Skirmish</button>
+          <button class="seg-btn" role="radio" aria-checked="false" data-fleet="classic">Classic</button>
+          <button class="seg-btn" role="radio" aria-checked="false" data-fleet="armada">Armada</button>
+          <button class="seg-btn" role="radio" aria-checked="false" data-fleet="tactical">Tactical</button>
+          <button class="seg-btn" role="radio" aria-checked="false" data-fleet="vanguard">Vanguard</button>
+        </div>
+        <p class="setting-note" id="fleet-note"></p>
+      </div>
+
+      <div class="setting-group">
+        <h3>Difficulty</h3>
+        <div class="seg" id="seg-diff" role="radiogroup" aria-label="Difficulty">
+          <button class="seg-btn" role="radio" aria-checked="false" data-diff="cadet">Cadet</button>
+          <button class="seg-btn" role="radio" aria-checked="false" data-diff="sailor">Sailor</button>
+          <button class="seg-btn" role="radio" aria-checked="false" data-diff="admiral">Admiral</button>
+        </div>
+        <p class="setting-note" id="diff-note"></p>
+      </div>
+
+      <div class="setting-group">
+        <h3>Audio</h3>
+        <label class="switch-row">
+          <span>Sound effects</span>
+          <input type="checkbox" id="opt-sound" />
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+        <label class="switch-row">
+          <span>Ambient bed</span>
+          <input type="checkbox" id="opt-music" />
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+        <label class="slider-row">
+          <span>Volume</span>
+          <input type="range" id="opt-volume" min="0" max="100" value="80" />
+        </label>
+      </div>
+
+      <div class="setting-group">
+        <h3>Rules &amp; Accessibility</h3>
+        <label class="switch-row">
+          <span>Extra shot after a hit</span>
+          <input type="checkbox" id="opt-fireagain" />
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+        <label class="switch-row">
+          <span>Ability mode <small>(sonar · barrage · torpedo)</small></span>
+          <input type="checkbox" id="opt-abilities" />
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+        <label class="switch-row">
+          <span>Reduced motion</span>
+          <input type="checkbox" id="opt-reduced" />
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+      </div>
+
+    </div>
+  </aside>
+  <div class="scrim" id="scrim" aria-hidden="true"></div>
+
+  <!-- ================= HOW TO PLAY ================= -->
+  <div id="howto" class="modal" aria-hidden="true" role="dialog" aria-label="How to play">
+    <div class="modal-card">
+      <button class="icon-btn modal-x" data-act="close-howto" aria-label="Close">✕</button>
+      <h2>How to Play</h2>
+      <ol class="howto-list">
+        <li><strong>Deploy your fleet.</strong> Ships come as lines <em>and</em> bent hulls (L, T, square) depending on the fleet. Tap a ship then a cell to place it (or drag on desktop). Press <kbd>R</kbd> to rotate. Use <strong>Auto-Place</strong> if you're in a hurry.</li>
+        <li><strong>Open fire.</strong> Click or tap a cell on <em>Enemy Waters</em> to launch. A miss splashes; a hit ignites; sink every enemy ship to win.</li>
+        <li><strong>Read the board.</strong> Markers use shape <em>and</em> colour — a ✕ ring is a miss, a filled burst is a hit, a skull means a ship went down.</li>
+        <li><strong>Hunt smart.</strong> When you land a hit, the ship continues in a straight line. Probe around hits to finish it off.</li>
+        <li><strong>Make it yours.</strong> Four themes, three fleets, three board sizes, and three AI captains — all in <strong>Customize</strong>.</li>
+        <li><strong>Use your tech.</strong> In ability mode, spend <em>Sonar</em> to scan a 3×3 for contacts, <em>Barrage</em> to bomb a 3×3, or <em>Torpedo</em> to rake a full row/column (<kbd>R</kbd> switches row/column). Each costs your turn — use them well.</li>
+        <li><strong>Play a friend.</strong> Choose <strong>Play a Friend</strong>, share the room code, and battle head-to-head — same device (two tabs) or online. Rematches need both players to agree.</li>
+      </ol>
+      <p class="howto-foot">Keyboard: arrow keys move the cursor, <kbd>Enter</kbd>/<kbd>Space</kbd> fires or places, <kbd>R</kbd> rotates.</p>
+      <button class="btn btn-primary" data-act="close-howto">Got it</button>
+    </div>
+  </div>
+
+  <!-- ================= GAME OVER ================= -->
+  <div id="gameover" class="modal" aria-hidden="true" role="dialog" aria-label="Game over">
+    <div class="modal-card gameover-card">
+      <div class="gameover-emblem" id="gameover-emblem" aria-hidden="true"></div>
+      <h2 id="gameover-title">Victory</h2>
+      <p id="gameover-sub" class="gameover-sub"></p>
+      <dl class="result-stats" id="result-stats"></dl>
+      <p id="rematch-status" class="online-status" hidden></p>
+      <div class="gameover-actions">
+        <button class="btn btn-primary btn-lg" id="btn-playagain" data-act="play-again">Play Again</button>
+        <button class="btn" data-act="home">Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PLAY ONLINE ================= -->
+  <div id="online" class="modal" aria-hidden="true" role="dialog" aria-label="Play a friend">
+    <div class="modal-card">
+      <button class="icon-btn modal-x" data-act="close-online" aria-label="Close">✕</button>
+      <h2>Play a Friend</h2>
+      <p class="online-mode" id="online-mode"></p>
+
+      <div class="online-pick" id="online-pick">
+        <button class="btn btn-primary btn-lg" data-act="create-room">Create a Room</button>
+        <div class="online-or"><span>or join one</span></div>
+        <div class="online-join">
+          <input id="room-code-input" maxlength="4" placeholder="CODE" autocomplete="off"
+                 autocapitalize="characters" spellcheck="false" aria-label="Room code" />
+          <button class="btn" data-act="join-room">Join</button>
+        </div>
+        <p class="setting-note" id="online-note"></p>
+      </div>
+
+      <div class="online-wait" id="online-wait" hidden>
+        <p class="online-share">Share this code with your opponent:</p>
+        <div class="room-code-display">
+          <span id="room-code-show">----</span>
+          <button class="icon-btn" data-act="copy-code" aria-label="Copy room code">⧉</button>
+        </div>
+        <p class="online-status" id="online-status">Waiting for opponent…</p>
+        <div class="spinner" aria-hidden="true"></div>
+        <button class="btn" data-act="leave-room">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= OPPONENT LEFT ================= -->
+  <div id="leftgame" class="modal" aria-hidden="true" role="dialog" aria-label="Opponent left">
+    <div class="modal-card gameover-card">
+      <div class="gameover-emblem" aria-hidden="true">🚪</div>
+      <h2>Opponent Left</h2>
+      <p id="leftgame-msg" class="gameover-sub"></p>
+      <div class="gameover-actions">
+        <button class="btn btn-primary btn-lg" data-act="new-online">New Online Game</button>
+        <button class="btn" data-act="home">Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- toast + a11y live region -->
+  <div id="toast" class="toast" aria-hidden="true"></div>
+  <div id="live" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- scripts (classic, dependency order — works from file://) -->
+  <script src="js/store.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/fx.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/net.js"></script>
+  <script src="js/themes.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
