@@ -162,10 +162,10 @@
     if (cur.phase !== 'playing' && cur.phase !== 'ended') return;
     fresh.forEach(function (r) {
       var p = Store.player(r.id); if (!p) return;
-      var c = MONO.Board.centerOf(p.position);
       var wrap = $('#board-wrap'); if (!wrap) return;
+      var rct = wrap.getBoundingClientRect(), c = MONO.Board.centerOf(p.position);
       var f = UI.el('div', 'floater', r.emoji);
-      f.style.left = (c.x + wrap.offsetLeft) + 'px'; f.style.top = (c.y + wrap.offsetTop) + 'px'; f.style.fontSize = '1.6rem';
+      f.style.left = (rct.left + c.x) + 'px'; f.style.top = (rct.top + c.y) + 'px'; f.style.fontSize = '1.6rem';
       $('#floaters').appendChild(f); setTimeout(function () { f.remove(); }, 1200);
     });
   }

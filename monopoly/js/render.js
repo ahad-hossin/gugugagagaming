@@ -61,12 +61,12 @@
     }
     // cash floaters + my sfx
     if (prev) {
+      var bw = $('#board-wrap'), rct = bw ? bw.getBoundingClientRect() : null;
       cur.players.forEach(function (np) {
         var op = pById(prev, np.id); if (!op) return;
         var delta = np.cash - op.cash;
         if (delta !== 0 && !np.bankrupt) {
-          var c = Board.centerOf(np.position);
-          UI.floater(delta, c.x + (($('#board-wrap') || {}).offsetLeft || 0), c.y + (($('#board-wrap') || {}).offsetTop || 0));
+          if (rct) { var c = Board.centerOf(np.position); UI.floater(delta, rct.left + c.x, rct.top + c.y); }
           if (np.id === Store.me() && A) A.play(delta > 0 ? 'cashin' : 'cashout');
         }
       });
