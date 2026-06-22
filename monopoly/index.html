@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <base href="/monopoly/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#05060e" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2305060e'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle'%3E%F0%9F%8E%A9%3C/text%3E%3C/svg%3E" />
+  <title>TYCOON — gugugagagaming</title>
+  <meta name="description" content="Online multiplayer property-trading game for up to 16 players." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Space+Mono&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/themes.css" />
+  <link rel="stylesheet" href="css/board.css" />
+  <link rel="stylesheet" href="css/ui.css" />
+</head>
+<body data-screen="home">
+  <canvas id="stars" aria-hidden="true"></canvas>
+
+  <!-- ============================ HOME ============================ -->
+  <section id="screen-home" class="screen">
+    <div class="home-wrap">
+      <header class="brand">
+        <h1 class="logo">TYCOON</h1>
+        <p class="tag">build an empire · trade · bankrupt your friends · up to 16 players</p>
+      </header>
+
+      <div class="identity card">
+        <h2>You</h2>
+        <div class="id-row">
+          <input id="id-name" maxlength="20" placeholder="Your name" autocomplete="off" />
+          <button id="id-emoji" class="emoji-btn" title="Pick a token">🎩</button>
+        </div>
+        <div id="id-colors" class="swatches" role="radiogroup" aria-label="Token colour"></div>
+        <div id="emoji-pop" class="emoji-pop" hidden></div>
+      </div>
+
+      <div class="home-actions">
+        <div class="card act">
+          <h2>Host a game</h2>
+          <p>Create a private room and invite up to 15 others.</p>
+          <button id="btn-create" class="primary">Create room</button>
+        </div>
+        <div class="card act">
+          <h2>Join a game</h2>
+          <p>Enter a 4-letter room code.</p>
+          <div class="join-row">
+            <input id="join-code" maxlength="4" placeholder="CODE" autocomplete="off" />
+            <button id="btn-join" class="primary">Join</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="resume-bar" class="resume" hidden>
+        <span>You have a game in progress.</span>
+        <button id="btn-resume" class="ghost">Rejoin</button>
+        <button id="btn-forget" class="link">forget</button>
+      </div>
+
+      <footer class="home-foot">
+        <button id="sound-toggle" class="ghost" aria-pressed="true">🔊 Sound on</button>
+        <a class="link" href="/">← back to the arcade</a>
+      </footer>
+      <p id="home-msg" class="msg" role="status"></p>
+    </div>
+  </section>
+
+  <!-- ============================ LOBBY ============================ -->
+  <section id="screen-lobby" class="screen">
+    <div class="lobby-wrap">
+      <header class="lobby-head">
+        <h1 class="logo small">TYCOON</h1>
+        <div class="room-id">
+          <span class="lbl">Room</span>
+          <code id="lobby-code">----</code>
+          <button id="btn-copy" class="ghost sm">Copy link</button>
+          <button id="btn-share" class="ghost sm" hidden>Share</button>
+        </div>
+      </header>
+
+      <div class="lobby-grid">
+        <div class="card">
+          <h2>Players <span id="lobby-count" class="dim"></span></h2>
+          <ul id="lobby-players" class="players"></ul>
+        </div>
+        <div class="card">
+          <h2>Settings</h2>
+          <div id="lobby-settings" class="settings"></div>
+          <p id="lobby-settings-note" class="dim sm"></p>
+        </div>
+      </div>
+
+      <div class="lobby-foot">
+        <button id="btn-ready" class="primary">Ready</button>
+        <button id="btn-start" class="primary go" hidden>Start game</button>
+        <button id="btn-leave-lobby" class="ghost">Leave</button>
+        <p id="lobby-msg" class="msg" role="status"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ GAME ============================ -->
+  <section id="screen-game" class="screen">
+    <div class="game-layout">
+      <div id="board-wrap">
+        <div id="board" role="img" aria-label="game board"></div>
+        <div id="tokens" aria-hidden="true"></div>
+        <div id="board-center">
+          <div class="center-brand">TYCOON</div>
+          <div id="pot" class="pot" hidden></div>
+          <div id="turn-banner" class="turn-banner"></div>
+          <div id="dice" class="dice"><span class="die" data-d="1"></span><span class="die" data-d="1"></span></div>
+          <div id="action-card" class="action-card"></div>
+        </div>
+      </div>
+
+      <aside id="sidebar">
+        <div id="dock" class="dock"></div>
+        <div class="side-tabs">
+          <button class="tab on" data-tab="log">Log</button>
+          <button class="tab" data-tab="chat">Chat</button>
+          <button class="tab" data-tab="props">My properties</button>
+        </div>
+        <div id="tab-log" class="tab-pane on"><ul id="log" class="log"></ul></div>
+        <div id="tab-chat" class="tab-pane">
+          <ul id="chat" class="chat"></ul>
+          <div class="chat-in"><input id="chat-input" maxlength="200" placeholder="Say something…" /><button id="chat-send" class="ghost sm">Send</button></div>
+          <div id="reactions-bar" class="reactions-bar"></div>
+        </div>
+        <div id="tab-props" class="tab-pane"><div id="my-props" class="my-props"></div></div>
+      </aside>
+    </div>
+
+    <div id="controls" class="controls"></div>
+
+    <button id="game-menu-btn" class="game-menu-btn" title="Menu">☰</button>
+  </section>
+
+  <!-- overlays -->
+  <div id="toast-root" class="toast-root" aria-live="polite"></div>
+  <div id="modal-root" class="modal-root" hidden></div>
+  <div id="card-overlay" class="card-overlay" hidden></div>
+  <div id="floaters" class="floaters" aria-hidden="true"></div>
+  <div id="confetti" class="confetti" aria-hidden="true"></div>
+
+  <script src="js/boarddata.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/net.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/board.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/lobby.js"></script>
+  <script src="js/trade.js"></script>
+  <script src="js/auction.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

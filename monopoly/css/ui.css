@@ -1,0 +1,117 @@
+/* ui.css — sidebar (dock/log/chat), controls, modals, toasts, overlays. */
+
+/* ---- sidebar ---- */
+#sidebar{display:flex;flex-direction:column;min-height:0;gap:.6rem}
+.dock{display:flex;flex-direction:column;gap:.4rem;overflow:auto;max-height:42vh;padding-right:2px}
+.pcard{display:flex;align-items:center;gap:.55rem;background:var(--card2);border:1px solid var(--border2);border-left:3px solid var(--pc,var(--glow));
+  border-radius:10px;padding:.45rem .6rem;position:relative}
+.pcard.turn{box-shadow:0 0 0 1px var(--gold),0 0 16px -4px var(--gold)}
+.pcard.out{opacity:.45;filter:grayscale(.5)}
+.pcard .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:1rem;border:2px solid var(--pc,#fff);flex:none;position:relative}
+.pcard .who{flex:1;min-width:0}
+.pcard .who .n{font-weight:600;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pcard .who .sub{font-family:var(--mono);font-size:.62rem;color:var(--dim)}
+.pcard .cash{font-family:var(--mono);font-size:.9rem;color:var(--gold);font-weight:700}
+.pcard .ring{position:absolute;left:.6rem;top:.45rem;width:30px;height:30px;border-radius:50%;pointer-events:none}
+.pcard .badge-jail,.pcard .badge-off{position:absolute;bottom:-3px;right:-3px;font-size:.6rem;background:var(--bg2);border-radius:6px;padding:0 2px}
+.pcard.you .who .n::after{content:" (you)";color:var(--dim);font-weight:400;font-size:.7rem}
+
+.side-tabs{display:flex;gap:.3rem}
+.tab{flex:1;background:var(--card2);border:1px solid var(--border2);color:var(--dim);border-radius:9px;padding:.4rem;font-size:.72rem;font-family:var(--mono)}
+.tab.on{color:var(--text);border-color:var(--glow)}
+.tab-pane{display:none;flex:1;min-height:0;background:var(--card);border:1px solid var(--border2);border-radius:10px;overflow:hidden}
+.tab-pane.on{display:flex;flex-direction:column}
+.log,.chat{list-style:none;margin:0;padding:.5rem .6rem;overflow:auto;flex:1;display:flex;flex-direction:column;gap:.25rem;font-family:var(--mono);font-size:.72rem}
+.log li{color:var(--dim);line-height:1.35;padding-bottom:.2rem;border-bottom:1px solid rgba(255,255,255,.03)}
+.log li.fresh{color:var(--text)}
+.chat li{color:var(--text);line-height:1.35}
+.chat li b{color:var(--glow)}
+.chat-in{display:flex;gap:.4rem;padding:.4rem;border-top:1px solid var(--border2)}
+.chat-in input{flex:1;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:.4rem .6rem;font-size:.8rem}
+.reactions-bar{display:flex;gap:.2rem;padding:.3rem .4rem;flex-wrap:wrap}
+.reactions-bar button{background:none;border:none;font-size:1.1rem;padding:.1rem .2rem;border-radius:6px}
+.reactions-bar button:hover{background:rgba(255,255,255,.08)}
+.my-props{padding:.5rem;overflow:auto;display:flex;flex-direction:column;gap:.4rem}
+
+/* ---- controls bar ---- */
+.controls{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;justify-content:center;padding:.7rem 1rem;
+  background:var(--card2);border-top:1px solid var(--border);min-height:60px}
+.controls .spacer{flex:1}
+.controls button{padding:.6rem 1rem;border-radius:11px;font-size:.85rem;font-weight:600}
+.controls .hint{font-family:var(--mono);font-size:.8rem;color:var(--dim)}
+.controls .hint b{color:var(--gold)}
+.btn-roll{background:linear-gradient(90deg,var(--gold),#ffae3d);color:#1c1400;border:none}
+.btn-go{background:linear-gradient(90deg,var(--good),#2fb56a);color:#04130a;border:none}
+.btn-bad{background:linear-gradient(90deg,var(--bad),#d83a4a);color:#fff;border:none}
+.btn-n{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text)}
+.btn-n:hover{border-color:var(--glow)}
+@media (max-width:880px){
+  .controls{position:sticky;bottom:0;z-index:20}
+}
+
+.game-menu-btn{position:fixed;top:.7rem;left:.7rem;z-index:30;width:40px;height:40px;border-radius:10px;
+  background:var(--card2);border:1px solid var(--border);color:var(--text);font-size:1.1rem}
+
+/* ---- toasts ---- */
+.toast-root{position:fixed;top:1rem;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:.4rem;align-items:center;pointer-events:none}
+.toast{background:var(--card2);border:1px solid var(--border);border-left:3px solid var(--glow);border-radius:10px;
+  padding:.5rem .9rem;font-size:.85rem;backdrop-filter:blur(8px);box-shadow:var(--shadow);animation:toastin .25s ease;max-width:90vw}
+.toast.bad{border-left-color:var(--bad)} .toast.good{border-left-color:var(--good)} .toast.gold{border-left-color:var(--gold)}
+@keyframes toastin{from{opacity:0;transform:translateY(-10px)}to{opacity:1}}
+
+/* ---- modals ---- */
+.modal-root{position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:rgba(2,4,10,.6);backdrop-filter:blur(4px);padding:1rem}
+.modal{background:var(--card2);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);max-width:min(560px,94vw);width:100%;max-height:90vh;overflow:auto;padding:1.4rem}
+.modal h2{font-family:var(--disp);font-size:1.1rem;letter-spacing:.05em;margin:0 0 1rem}
+.modal .row{display:flex;gap:.6rem;justify-content:flex-end;margin-top:1.2rem;flex-wrap:wrap}
+.modal .full{width:100%}
+
+/* property detail */
+.prop-detail .head{height:36px;border-radius:8px;display:grid;place-items:center;font-family:var(--disp);letter-spacing:.05em;color:#04121c;margin-bottom:.8rem}
+.rent-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.8rem}
+.rent-table td{padding:.25rem .4rem;border-bottom:1px solid var(--border2)}
+.rent-table td:last-child{text-align:right;color:var(--gold)}
+
+/* ---- card draw overlay ---- */
+.card-overlay{position:fixed;inset:0;z-index:280;display:grid;place-items:center;background:rgba(2,4,10,.55);backdrop-filter:blur(3px)}
+.draw-card{width:min(360px,86vw);background:linear-gradient(160deg,#0e1f3c,#0a1326);border:1px solid var(--gold);border-radius:18px;padding:1.6rem;text-align:center;
+  box-shadow:0 0 50px rgba(255,210,61,.25);animation:cardflip .5s ease}
+.draw-card .kind{font-family:var(--disp);letter-spacing:.12em;font-size:.8rem;color:var(--gold);margin-bottom:1rem}
+.draw-card .txt{font-size:1.05rem;line-height:1.5}
+@keyframes cardflip{from{transform:perspective(700px) rotateY(90deg);opacity:0}to{transform:none;opacity:1}}
+
+/* ---- money floaters & confetti ---- */
+.floaters{position:fixed;inset:0;z-index:250;pointer-events:none}
+.floater{position:absolute;font-family:var(--mono);font-weight:700;font-size:1rem;animation:floatup 1.1s ease forwards}
+.floater.plus{color:var(--good)} .floater.minus{color:var(--bad)}
+@keyframes floatup{from{opacity:0;transform:translateY(8px) scale(.8)}20%{opacity:1}to{opacity:0;transform:translateY(-50px) scale(1.1)}}
+.confetti{position:fixed;inset:0;z-index:260;pointer-events:none;overflow:hidden}
+.confetti i{position:absolute;top:-12px;width:9px;height:14px;opacity:.9;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+/* ---- auction / trade ---- */
+.auction .lot{font-family:var(--disp);text-align:center;font-size:1.1rem;margin:.4rem 0}
+.auction .high{text-align:center;font-family:var(--mono);color:var(--gold);font-size:1.4rem;margin:.4rem 0}
+.auction .bidders{display:flex;flex-wrap:wrap;gap:.3rem;justify-content:center;margin:.6rem 0}
+.auction .quick{display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap}
+.trade-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media (max-width:520px){.trade-grid{grid-template-columns:1fr}}
+.trade-col h3{font-family:var(--disp);font-size:.8rem;letter-spacing:.06em;margin:0 0 .5rem}
+.trade-col .pi{display:flex;align-items:center;gap:.4rem;font-size:.78rem;padding:.25rem;border-radius:6px;cursor:pointer}
+.trade-col .pi:hover{background:rgba(255,255,255,.05)}
+.trade-col .pi input{margin:0}
+.trade-cash{display:flex;align-items:center;gap:.4rem;margin-top:.5rem}
+.trade-cash input{width:90px;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:.3rem}
+.balance{text-align:center;font-family:var(--mono);font-size:.8rem;margin:.6rem 0;color:var(--dim)}
+.pchip{display:inline-flex;align-items:center;gap:.3rem;font-family:var(--mono);font-size:.7rem;border:1px solid var(--own,var(--border));border-radius:999px;padding:.1rem .5rem;color:var(--text)}
+.pchip-dot{width:8px;height:8px;border-radius:2px;background:var(--own,#fff)}
+
+/* end overlay */
+.end-card{text-align:center}
+.end-card .crown{font-size:3rem}
+.end-card .winner{font-family:var(--disp);font-size:1.6rem;background:linear-gradient(90deg,var(--gold),var(--glow));-webkit-background-clip:text;background-clip:text;color:transparent;margin:.4rem 0}
+.standings{list-style:none;padding:0;margin:1rem 0;font-family:var(--mono);font-size:.82rem;text-align:left}
+.standings li{display:flex;justify-content:space-between;padding:.3rem .5rem;border-bottom:1px solid var(--border2)}
+
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+body.noanim *{animation:none!important;transition:none!important}
